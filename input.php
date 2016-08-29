@@ -1,7 +1,14 @@
 <?php
-	include 'headers.php';
-	error_reporting(0);
-
+	//include 'headers.php';
+	//error_reporting(0);
+    /*
+     * NM notes:
+     * Added close tab button to output tabs. Not functional yet.
+     * Added fixes for missing php variables detected when running with error reporting on.
+     * 
+     */
+    $user = new stdClass();
+    $user->data['is_registered'] = false;
 ?>
 <!DOCTYPE html>
 <html lang="en" ng-app="cFIREsim">
@@ -80,8 +87,7 @@
 		.ot_banner_output a {
 			color: #23568f;
 		}
-
-
+         
 		</style>
 		<script src='https://code.jquery.com/jquery-1.11.3.min.js' language='Javascript' type='text/javascript'></script>
 		<script type="text/javascript" src="http://dygraphs.com/dygraph-combined.js"></script>
@@ -108,6 +114,14 @@
 		<link href="css/bootstrap-tour.min.css" rel="stylesheet"> <!-- Dependency for cFIREsim tour -->
 		<link href="css/bootstrap-select.min.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs/dt-1.10.8/datatables.min.css"/>
+        <style>
+       /* NM added*/
+        button.output-tab-close{
+            padding-left: 6px;
+            padding-right:6px;
+        }
+        
+		</style>
 	</head>
 	<body>
 		<!-- Welcome Modal -->
@@ -1120,16 +1134,16 @@
 		        <div class="modal-body" id="output">
 					<div id="tabNav" class="container-fullwidth">
             			<ul class="nav nav-pills" id="tabNames">
-            				<li class="active"><a href="#1a" data-toggle="tab">Sim 1</a></li>
-							<li style="display:none"><a href="#2a" data-toggle="tab">Sim 2</a></li>
-							<li style="display:none"><a href="#3a" data-toggle="tab">Sim 3</a></li>
-							<li style="display:none"><a href="#4a" data-toggle="tab">Sim 4</a></li>
-							<li style="display:none"><a href="#5a" data-toggle="tab">Sim 5</a></li>
-							<li style="display:none"><a href="#6a" data-toggle="tab">Sim 6</a></li>
-							<li style="display:none"><a href="#7a" data-toggle="tab">Sim 7</a></li>
-							<li style="display:none"><a href="#8a" data-toggle="tab">Sim 8</a></li>
-							<li style="display:none"><a href="#9a" data-toggle="tab">Sim 9</a></li>
-							<li style="display:none"><a href="#10a" data-toggle="tab">Sim 10</a></li>
+            				<li class="active"><a href="#1a" data-toggle="tab">Sim 1 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#2a" data-toggle="tab">Sim 2 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#3a" data-toggle="tab">Sim 3 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#4a" data-toggle="tab">Sim 4 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#5a" data-toggle="tab">Sim 5 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#6a" data-toggle="tab">Sim 6 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#7a" data-toggle="tab">Sim 7 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#8a" data-toggle="tab">Sim 8 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#9a" data-toggle="tab">Sim 9 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+							<li style="display:none"><a href="#10a" data-toggle="tab">Sim 10 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
             			</ul>
 						<!--
 							Tabs are stubbed out here, because if they do not exist at load time, the output graphs cannot be written to.
@@ -2017,6 +2031,7 @@ formInputs: [
 				console.log("Validating...");
 			    return (value > 0);
 			};
+                       
             // Setup the spending form when the controller loads.
             $scope.refreshSpendingForm()
         }
@@ -2026,7 +2041,7 @@ formInputs: [
 
 </script>
 <script type="text/javascript">
-  <?php echo 'var session = "'.json_encode($_SESSION['msg']).'";'; ?>
+  <?php echo 'var session = "'.(isset($_SESSION['msg']) ? json_encode($_SESSION['msg']) : "").'";'; ?>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -2039,5 +2054,13 @@ formInputs: [
 	if (Number.isInteger(loadedByID)){
 		Simulation.getSavedSim(loadedByID);
 	}
-  
+</script>  
+<script type="text/javascript">
+$('body').ready(function(){            
+    $('.output-tab-close').on('click', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        //alert('clicked close');
+    });
+});
 </script>
