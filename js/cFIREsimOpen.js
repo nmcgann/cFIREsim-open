@@ -81,6 +81,7 @@ var Simulation = {
     sim: [],
     tabs: 0,
 	g: [], //dygraph object
+    simList: [],
     getQueries: function() {
 		var username = $("#username").html();
         $.ajax({
@@ -162,6 +163,7 @@ var Simulation = {
     },
     runSimulation: function(form) {
         this.tabs++;
+        this.tabs = (this.tabs > 10) ? 10 : this.tabs; //10 tabs max
         console.log("Form Data:", form);
         this.sim = []; //Deletes previous simulation values if they exist.
         var startYear = new Date().getFullYear();
@@ -206,18 +208,29 @@ var Simulation = {
 	                this.calcEndPortfolio(form, i, j); //Sum up ending portfolio
 	            }
 	        }
-	        
+
+                //save sim flag
+                this.simList[this.tabs] = true;
+                //console.log(this.simList);
+
             //Run post-simulation functions
-	        this.convertToCSV(this.sim);
+	        this.convertToCSV(this.sim, this.tabs);
 	        this.calcFailures(this.sim);
-	        this.displayGraph(this.sim, form);
+	        this.displayGraph(this.sim, form, this.tabs);
 	
 	        //Initialize statistics calculations
-	        StatsModule.init(this.sim, form);
+	        StatsModule.init(this.sim, form, this.tabs);
 
 		}else{
-			this.calcInvestigation(this.sim, form);
+                    //save sim flag
+                    this.simList[this.tabs] = true;
+                    //console.log(this.simList);
+
+			this.calcInvestigation(this.sim, form, this.tabs);
 		}
+        //moved out of displayGraph - shows drawn tab        
+        $('#tabNav a[href="#' + this.tabs + 'a"]').tab('show');
+        $('a[href="#'+ this.tabs +'a"]').parent('li').show();
 
     },
     cycle: function(startOfRange, endOfRange) {
@@ -526,7 +539,7 @@ var Simulation = {
             return parseInt(adj.val);
         }
     },
-    calcInvestigation: function(sim, form){
+    calcInvestigation: function(sim, form, tab){
     	if(form.investigate.type == 'maxInitialSpending'){
 			var min = 0, max = 1000000;
 			while (Math.round(min) <= Math.round(max)){
@@ -553,21 +566,21 @@ var Simulation = {
 				}else{
 					var html = "<b>Investigate Maximum Initial Spending</b>: Considering all other inputs, the maximum intiial spending would be <b style='color:#AAFF69'>" + accounting.formatMoney(Math.floor(mid), "$", 0) + "</b>.";
 					//Run post-simulation functions
-			        this.convertToCSV(this.sim);
+			        this.convertToCSV(this.sim, tab);
 			        this.calcFailures(this.sim);
-			        this.displayGraph(this.sim, form);
+			        this.displayGraph(this.sim, form, tab);
 			
 			        //Initialize statistics calculations
-			        StatsModule.init(this.sim, form);
+			        StatsModule.init(this.sim, form, tab);
 			        
 			        //Display Investigation Results
-			        $("#graph" + Simulation.tabs).parent().prepend(html);
+			        $("#graph" + tab).parent().prepend(html);
 					break;
 				}
 			}
 		}	
     },
-    displayGraph: function(results, form) {
+    displayGraph: function(results, form, tab) {
         var chartData = [];
         var spendingData = [];
         var interval = results.length;
@@ -627,7 +640,7 @@ var Simulation = {
         //Portfolio Graph
         Simulation.g.push(new Dygraph(
             // containing div
-            document.getElementById("graph" + Simulation.tabs),
+            document.getElementById("graph" + tab),
             chartData, {
                 labels: labels.slice(),
                 legend: 'always',
@@ -638,7 +651,7 @@ var Simulation = {
                     'textAlign': 'right'
                 },
                 labelsDivWidth: 500,
-                labelsDiv: 'labels' + Simulation.tabs,
+                labelsDiv: 'labels' + tab,
                 digitsAfterDecimal: 0,
                 axes: {
                     y: {
@@ -677,7 +690,7 @@ var Simulation = {
         //Spending Graph
         Simulation.g.push(new Dygraph(
             // containing div
-            document.getElementById("graph" + Simulation.tabs + "b"),
+            document.getElementById("graph" + tab + "b"),
             spendingData, {
                 labels: labels.slice(),
                 legend: 'always',
@@ -687,7 +700,7 @@ var Simulation = {
                 labelsDivStyles: {
                     'textAlign': 'right'
                 },
-                labelsDiv: 'labels' + Simulation.tabs + "b",
+                labelsDiv: 'labels' + tab + "b",
                 labelsDivWidth: 500,
                 digitsAfterDecimal: 0,
                 axes: {
@@ -722,10 +735,10 @@ var Simulation = {
             }
         ));
 
-        $('#tabNav a[href="#' + Simulation.tabs + 'a"]').tab('show');
-        $('a[href="#'+ Simulation.tabs+'a"]').parent('li').show();
+        //$('#tabNav a[href="#' + tab + 'a"]').tab('show');
+        //$('a[href="#'+ tab +'a"]').parent('li').show();
     },
-    convertToCSV: function(results) { //converts a random cycle of simulation into a CSV file, for users to easily view
+    convertToCSV: function(results, tab) { //converts a random cycle of simulation into a CSV file, for users to easily view
         var csv = "";
         /*
         //Random number generator for supplying a CSV of only 1 random cycle. Disabled for debugging purposes.
@@ -793,7 +806,7 @@ var Simulation = {
 
         //this part will append the anchor tag and remove it after automatic click
         document.body.appendChild(link);
-        $(link).appendTo("#download"+Simulation.tabs);
+        $(link).appendTo("#download"+tab);
 		$(link).addClass("btn btn-success btn-lg");
         //link.click();
         //document.body.removeChild(link);

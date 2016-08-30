@@ -8,10 +8,11 @@ All other properties can support the main statistical analysis functions
 
 The "form" parameter for each function contains all of the form inputs. This can be seen in the javascript console when a simulation is ran.
 The "sim" parameter for each function is a multi-dimensional array of the simulation results.  sim[0][0] is the first year of the first simulation cycle. sim[9][25] is the 26th year of the 10th simulation cycle.  In crafting a new spending method, sim[i][j] represents the current year, and sim[i][j-1] represents the previous year (if you want to do calculations based on the previous year).
-*/
+NM: added tab parameter.
+ */
 
 var StatsModule = {
-    init: function(sim, form) {
+    init: function(sim, form, tab) {
 		this.finalStats =  {
 			"successRate": null,
 				"failures": null,
@@ -116,7 +117,8 @@ var StatsModule = {
 		var dataSet1a = [
 			[Math.round(100*this.finalStats.successRate)/100 + "%", accounting.formatMoney(this.finalStats.avgPortfolioAtRetirement, "$", 0)]
 		];
-        $('#stats'+Simulation.tabs+"a").DataTable( {
+        $('#stats'+tab+"a").DataTable( {
+            destroy: true, //allow overwrite of existing table
 			data: dataSet1a,
 			columns: [
 				{ title: "Success Rate" },
@@ -137,7 +139,8 @@ var StatsModule = {
 			["Highest:", accounting.formatMoney(this.finalStats.highest.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.highest.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.highest.totalWithdrawals, "$", 0)],
 			["Lowest:", accounting.formatMoney(this.finalStats.lowest.endingPortfolios, "$", 0), accounting.formatMoney(this.finalStats.lowest.yearlyWithdrawals, "$", 0), accounting.formatMoney(this.finalStats.lowest.totalWithdrawals, "$", 0)],
 		];
-        $('#stats'+Simulation.tabs+"b").DataTable( {
+        $('#stats'+tab+"b").DataTable( {
+            destroy: true, //allow overwrite of existing table
 			data: dataSet1b,
 			columns: [
 				{ title: "" },
@@ -161,7 +164,8 @@ var StatsModule = {
 			["Failures:", this.finalStats.withdrawalAnalysis.failures.first5years, this.finalStats.withdrawalAnalysis.failures.thirds[0], this.finalStats.withdrawalAnalysis.failures.thirds[1], this.finalStats.withdrawalAnalysis.failures.thirds[2]],
 		];
 		dataSet1c = roundData(dataSet1c);
-        $('#stats'+Simulation.tabs+"c").DataTable( {
+        $('#stats'+tab+"c").DataTable( {
+            destroy: true, //allow overwrite of existing table
 			data: dataSet1c,
 			columns: [
 				{ title: "Withdrawal Analysis" },
@@ -183,7 +187,8 @@ var StatsModule = {
             [">40% below initial:", this.finalStats.dipAnalysis.below40.portfolioDips, this.finalStats.dipAnalysis.below40.maxPortfolioDips, this.finalStats.dipAnalysis.below40.withdrawalDips, this.finalStats.dipAnalysis.below40.maxWithdrawalDips],
             [">60% below initial:", this.finalStats.dipAnalysis.below60.portfolioDips, this.finalStats.dipAnalysis.below60.maxPortfolioDips, this.finalStats.dipAnalysis.below60.withdrawalDips, this.finalStats.dipAnalysis.below60.maxWithdrawalDips],
         ];
-        $('#stats'+Simulation.tabs+"d").DataTable( {
+        $('#stats'+tab+"d").DataTable( {
+            destroy: true, //allow overwrite of existing table
             data: dataSet1d,
             columns: [
                 { title: "Dip Analysis" },
@@ -206,7 +211,8 @@ var StatsModule = {
             ["4th Lowest Dip:", accounting.formatMoney(this.finalStats.individualDips.portfolioDips[3].portfolio, "$", 0), this.finalStats.individualDips.portfolioDips[3].cycleStart + "/" + this.finalStats.individualDips.portfolioDips[3].dipYear, accounting.formatMoney(this.finalStats.individualDips.withdrawalDips[3].withdrawal, "$", 0), this.finalStats.individualDips.withdrawalDips[0].cycleStart + "/" + this.finalStats.individualDips.withdrawalDips[0].dipYear],
             ["5th Lowest Dip:", accounting.formatMoney(this.finalStats.individualDips.portfolioDips[4].portfolio, "$", 0), this.finalStats.individualDips.portfolioDips[4].cycleStart + "/" + this.finalStats.individualDips.portfolioDips[4].dipYear, accounting.formatMoney(this.finalStats.individualDips.withdrawalDips[4].withdrawal, "$", 0), this.finalStats.individualDips.withdrawalDips[0].cycleStart + "/" + this.finalStats.individualDips.withdrawalDips[0].dipYear],
         ];
-        $('#stats'+Simulation.tabs+"e").DataTable( {
+        $('#stats'+tab+"e").DataTable( {
+            destroy: true, //allow overwrite of existing table
             data: dataSet1e,
             columns: [
                 { title: "Individual Dips" },
@@ -222,7 +228,8 @@ var StatsModule = {
         } );
 
         //Add mouseover info to output tabs
-        $('#tabNames li.active').tooltip({
+        //$('#tabNames li.active').tooltip({
+        $('#tabNames li').eq(tab-1).tooltip({
             trigger: 'hover',
             html: true,
             title: 'Retirement: '+form.retirementStartYear+'-'+form.retirementEndYear+

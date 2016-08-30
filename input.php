@@ -1432,7 +1432,7 @@
 									<div id='labels10' style='background:white;width:800px;height:20px;' class='output'></div>
 									<div id='graph10b' style='width:800px; height:400px;background:white;' class='output'></div>
 									<div id='labels10b' style='background:white;width:800px;height:20px;' class='output'></div>
-									<div id='download1'></div>
+									<div id='download10'></div><!-- fixed error in id -->
 									<p>
 										<h1>
 											Statistics
@@ -2061,6 +2061,15 @@ $('body').ready(function(){
         e.stopPropagation();
         e.preventDefault();
         //alert('clicked close');
+        var $li = $(e.target).parents('li'),
+        $a = $li.children('a'),
+        tabno = $a.attr('href').match(/^#(\d+)a/);
+        if(tabno) {
+            tabno = parseInt(tabno[1],10);
+        }
+        console.log($li, $a, tabno);
     });
 });
+//<li class="active"><a href="#1a" data-toggle="tab">Sim 1 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+
 </script>
