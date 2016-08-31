@@ -81,7 +81,7 @@ var Simulation = {
     sim: [],
     tabs: 0,
 	g: [], //dygraph object
-    simList: [],
+    tabList: [0,0,0,0,0,0,0,0,0,0],
     getQueries: function() {
 		var username = $("#username").html();
         $.ajax({
@@ -161,9 +161,33 @@ var Simulation = {
             });
         });
     },
+    //nm
+    nextEmptyTab: function(){
+        for(var i = 0, len = this.tabList.length; i < len; i++){
+            if(this.tabList[i] === 0) break;
+        }
+        return i;
+    },
+    countTabs: function(){
+        
+    },
+    deleteTab: function(tab){
+        if(this.nextEmptyTab() < 1) return; //can't delete when only 1
+        
+        this.tabList[tab-1] = 0;
+        
+//        $('#tabNav a[href="#' + tab + 'a"]').tab('show');
+//        $('a[href="#'+ tab +'a"]').parent('li').hide();
+console.log('deleted:',tab,this.tabList);
+    },
     runSimulation: function(form) {
         this.tabs++;
+        //nm
         this.tabs = (this.tabs > 10) ? 10 : this.tabs; //10 tabs max
+        var tab = this.nextEmptyTab();
+        this.tabList[tab] = this.tabs;
+console.log(this.tabList);
+
         console.log("Form Data:", form);
         this.sim = []; //Deletes previous simulation values if they exist.
         var startYear = new Date().getFullYear();
@@ -209,10 +233,6 @@ var Simulation = {
 	            }
 	        }
 
-                //save sim flag
-                this.simList[this.tabs] = true;
-                //console.log(this.simList);
-
             //Run post-simulation functions
 	        this.convertToCSV(this.sim, this.tabs);
 	        this.calcFailures(this.sim);
@@ -222,9 +242,6 @@ var Simulation = {
 	        StatsModule.init(this.sim, form, this.tabs);
 
 		}else{
-                    //save sim flag
-                    this.simList[this.tabs] = true;
-                    //console.log(this.simList);
 
 			this.calcInvestigation(this.sim, form, this.tabs);
 		}

@@ -2063,11 +2063,13 @@ $('body').ready(function(){
         //alert('clicked close');
         var $li = $(e.target).parents('li'),
         $a = $li.children('a'),
-        tabno = $a.attr('href').match(/^#(\d+)a/);
+        tabno = $a.attr('href').match(/^#(\d+)a/),
+        isActive = $li.hasClass('active');
         if(tabno) {
             tabno = parseInt(tabno[1],10);
         }
-        console.log($li, $a, tabno);
+        console.log($li, $a, isActive, tabno);
+        Simulation.deleteTab(tabno);
     });
 });
 //<li class="active"><a href="#1a" data-toggle="tab">Sim 1 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
