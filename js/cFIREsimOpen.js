@@ -162,30 +162,67 @@ var Simulation = {
         });
     },
     //nm
-    nextEmptyTab: function(){
-        for(var i = 0, len = this.tabList.length; i < len; i++){
-            if(this.tabList[i] === 0) break;
+    nextEmptySlot: function(){
+        var slots = [0,0,0,0,0,0,0,0,0,0];
+        
+        for(var i = 0, len = this.tabs; i < len; i++){
+            slots[this.tabList[i]] = 1;
         }
+        
+        
+        for(var i = 0, len = slots.length; i < len; i++){
+            if(slots[i] === 0) break;
+        }
+console.log('nextEmptySlot', i);     
         return i;
+        
     },
     countTabs: function(){
         
     },
     deleteTab: function(tab){
-        if(this.nextEmptyTab() < 1) return; //can't delete when only 1
-        
-        this.tabList[tab-1] = 0;
+        if(this.tabs <= 1) return; //can't delete when only 1
+        this.tabs--;
+        //this.tabList[tab-1] = 0;
+        this.tabList.splice(tab-1, 1);
+        this.tabList.push(0);
         
 //        $('#tabNav a[href="#' + tab + 'a"]').tab('show');
 //        $('a[href="#'+ tab +'a"]').parent('li').hide();
-console.log('deleted:',tab,this.tabList);
+console.log('deleted:',tab,this.tabs,this.tabList);
+        this.reWriteTabs();
+    },
+    reWriteTabs: function(){
+//<ul class="nav nav-pills" id="tabNames">
+//        <li class="active"><a href="#1a" data-toggle="tab">Sim 1 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+ //       <li style="display:none"><a href="#2a" data-toggle="tab">Sim 2 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>
+ 
+        var html = [];
+        for(var i=0,len=this.tabList.length; i<len; i++){
+            if(i===0){
+                html.push('<li class="active"><a href="#'+this.tabList[i]+'a" data-toggle="tab">Sim 1 <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>');
+console.log(i);                    
+
+            }else{
+                if(this.tabList[i] != 0){
+                html.push('<li><a href="#'+this.tabList[i]+'a" data-toggle="tab">Sim '+(i+1)+' <button aria-hidden="true" class="close output-tab-close" type="button" title="Close Tab">×</button></a></li>');
+console.log(i);                    
+                }
+            }
+        }
+ 
+        $('#tabNames').empty().append(html.join(''));
+        //$('#tabNav a').eq(0).tab('show');
+        //$('a[href="#'+ 1 +'a"]').parent('li').show();
+
     },
     runSimulation: function(form) {
         this.tabs++;
         //nm
         this.tabs = (this.tabs > 10) ? 10 : this.tabs; //10 tabs max
-        var tab = this.nextEmptyTab();
-        this.tabList[tab] = this.tabs;
+        var tab = this.nextEmptySlot();
+        this.tabList[this.tabs - 1] = tab;
+        //this.reWriteTabs();
 console.log(this.tabList);
 
         console.log("Form Data:", form);
@@ -234,20 +271,20 @@ console.log(this.tabList);
 	        }
 
             //Run post-simulation functions
-	        this.convertToCSV(this.sim, this.tabs);
+	        this.convertToCSV(this.sim, tab);
 	        this.calcFailures(this.sim);
-	        this.displayGraph(this.sim, form, this.tabs);
+	        this.displayGraph(this.sim, form, tab);
 	
 	        //Initialize statistics calculations
-	        StatsModule.init(this.sim, form, this.tabs);
+	        StatsModule.init(this.sim, form, tab);
 
 		}else{
 
-			this.calcInvestigation(this.sim, form, this.tabs);
+			this.calcInvestigation(this.sim, form, tab);
 		}
         //moved out of displayGraph - shows drawn tab        
-        $('#tabNav a[href="#' + this.tabs + 'a"]').tab('show');
-        $('a[href="#'+ this.tabs +'a"]').parent('li').show();
+        $('#tabNav a[href="#' + tab + 'a"]').tab('show');
+        $('a[href="#'+ tab +'a"]').parent('li').show();
 
     },
     cycle: function(startOfRange, endOfRange) {

@@ -2057,7 +2057,7 @@ formInputs: [
 </script>  
 <script type="text/javascript">
 $('body').ready(function(){            
-    $('.output-tab-close').on('click', function(e){
+    $('#tabNames').on('click', '.output-tab-close', function(e){
         e.stopPropagation();
         e.preventDefault();
         //alert('clicked close');
