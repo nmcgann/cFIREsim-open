@@ -214,7 +214,10 @@ console.log(i);
         $('#tabNames').empty().append(html.join(''));
         //$('#tabNav a').eq(0).tab('show');
         //$('a[href="#'+ 1 +'a"]').parent('li').show();
-
+        //THIS DOESN'T HELP
+        for(var i=0,len = this.g.length; i<len; i++){
+            //this.g[i].updateOptions({}); //Dygraph re-draw
+        }
     },
     runSimulation: function(form) {
         this.tabs++;
@@ -222,7 +225,7 @@ console.log(i);
         this.tabs = (this.tabs > 10) ? 10 : this.tabs; //10 tabs max
         var tab = this.nextEmptySlot();
         this.tabList[this.tabs - 1] = tab;
-        //this.reWriteTabs();
+        this.reWriteTabs();
 console.log(this.tabList);
 
         console.log("Form Data:", form);
